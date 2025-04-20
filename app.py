@@ -1,3 +1,6 @@
+import os
+os.environ["TORCH_DISABLE_RETRY_MODULE_LOOKUP"] = "1"  # Prevents torch class path errors
+
 import torch
 import streamlit as st
 from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
@@ -30,29 +33,30 @@ def is_meaningful_prompt(prompt):
         st.warning("Prompt seems to be gibberish.")
         return False
 
-# Title
-st.title("🖼️ Image Generator using Stable Diffusion")
+# Streamlit Title
+st.title("🎨 AI Image Generator (Stable Diffusion)")
 
 # User input
-prompt = st.text_input("Enter a prompt to generate an image:")
+prompt = st.text_input("📝 Enter a prompt to generate an image:")
 
-# Load model (only once)
+# Load the model only once
 @st.cache_resource
 def load_pipeline():
     model_id = "stabilityai/stable-diffusion-2"
     scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
     pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float32)
-    pipe = pipe.to("cpu")  # Use CPU to work on Streamlit Cloud
+    pipe = pipe.to("cpu")  # Streamlit Cloud doesn't support GPU
     return pipe
 
 pipe = load_pipeline()
 
-# Button to generate
-if st.button("Generate Image"):
+# Button to generate image
+if st.button("🚀 Generate Image"):
     if is_meaningful_prompt(prompt):
         with st.spinner("Generating image..."):
             image = pipe(prompt).images[0]
-            st.image(image, caption="Generated Image", use_column_width=True)
+            st.image(image, caption="✅ Generated Image", use_column_width=True)
     else:
-        st.info("Please enter a valid prompt.")
+        st.info("❗ Please enter a more descriptive prompt.")
+
 
