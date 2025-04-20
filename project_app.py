@@ -15,7 +15,7 @@ def load_pipeline():
     model_id = "stabilityai/stable-diffusion-2"
     scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
     pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float16)
-    return pipe.to("cuda")
+    return pipe.to("cpu")
 
 def is_meaningful_prompt(prompt):
     prompt = prompt.strip()
