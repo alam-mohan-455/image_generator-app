@@ -1,6 +1,6 @@
 import os
 os.environ["TORCH_DISABLE_RETRY_MODULE_LOOKUP"] = "1"  # Prevents torch class path errors
-
+os.environ["STREAMLIT_WATCHER_TYPE"] = "none"  # Disable file watcher to prevent crash
 import torch
 import streamlit as st
 from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
