@@ -1,6 +1,7 @@
 import os
 os.environ["TORCH_DISABLE_RETRY_MODULE_LOOKUP"] = "1"  # Prevents torch class path errors
 os.environ["STREAMLIT_WATCHER_TYPE"] = "none"  # Disable file watcher to prevent crash
+
 import torch
 import streamlit as st
 from diffusers import StableDiffusionPipeline, EulerDiscreteScheduler
@@ -45,7 +46,10 @@ def load_pipeline():
     model_id = "stabilityai/stable-diffusion-2"
     scheduler = EulerDiscreteScheduler.from_pretrained(model_id, subfolder="scheduler")
     pipe = StableDiffusionPipeline.from_pretrained(model_id, scheduler=scheduler, torch_dtype=torch.float32)
-    pipe = pipe.to("cpu")  # Streamlit Cloud doesn't support GPU
+    
+    # Check if CUDA is available and use GPU if possible, otherwise fallback to CPU
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    pipe = pipe.to(device)  # Move to appropriate device (GPU/CPU)
     return pipe
 
 pipe = load_pipeline()
